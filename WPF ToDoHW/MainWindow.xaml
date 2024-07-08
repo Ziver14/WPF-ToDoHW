@@ -9,6 +9,36 @@
         Background="#FFFDFAF1"             
         Title="Список дел" Height="450" Width="400">
     <Window.Resources>
+        <local:OneConverter x:Key="OneConverter"/>
+        <local:TwoConverter x:Key="TwoConverter"/>
+        <local:ThreeConverter x:Key="ThreeConverter"/>
+
+        <Style x:Key="stroke" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=checkbox, Path=IsChecked}" Value="True">
+                    <Setter Property="TextDecorations" Value="Strikethrough"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="date" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#FF71C52f"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Date,Converter=OneConverter}" Value="True">
+                    <Setter Property="Control.Foreground" Value="red"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Date,Converter=TwoConverter}" Value="True">
+                    <Setter Property="Control.Foreground" Value="#FFEA6A20"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Date,Converter=ThreeConverter}" Value="True">
+                    <Setter Property="Control.Foreground" Value="#DAA520"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
+               
         <Style TargetType="DataGrid">
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="CanUserAddRows" Value="False"/>
@@ -46,7 +76,7 @@
             <Image Source="Resources\add.png" Width="20" Height="15"/>
         </Button>
 
-        <DataGrid IsReadOnly="True" Grid.ColumnSpan="2" Margin="12 0" x:Name="ListToDo" 
+        <!--<DataGrid IsReadOnly="True" Grid.ColumnSpan="2" Margin="12 0" x:Name="ListToDo" 
                   Background="#fdf5df" Grid.Row="1" AutoGenerateColumns="False" 
                   GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
@@ -77,9 +107,54 @@
                                Background="AliceBlue">
                     </TextBlock>
                 </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
+            </DataGrid.RowDetailsTemplate>-->
 
-        </DataGrid>
+        <!--</DataGrid>-->
+        <ListBox
+            Grid.ColumnSpan="2"
+            Margin="12 0"
+            x:Name="listToDo"
+            Background="#FDF5DF"
+            Grid.Row="1"
+            HorizontalContentAlignment="Stretch"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <CheckBox Grid.Column="0" x:Name="checkbox" Unchecked="CheckBox_Unchecked"
+                                  Checked="CheckBox_Unchecked" IsChecked="{Binding Done}"/>
+                        <TextBlock Style="{StaticResource stroke}" Grid.Column="1" Text="{Binding Title}"
+                                   HorizontalAlignment="Left" Margin="8 0 0 0"/>
+                        <TextBlock Grid.Column="2" Text="{Binding Date,  StringFormat=dd.MM.yyyy}" Margin="0 0 8 0" Style="{StaticResource Date}">
+                        </TextBlock>
+                        <Button Grid.Column="3" Click="DeleteJob" Background="#5ebec4" BorderThickness="0">
+                            <Image Source="Resources\delete.png" Width="10" Height="15"/>
+                        </Button>
+                        <TextBlock Grid.Row="1" Grid.ColumnSpan="4" Text="{Binding Description}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            
+        </ListBox>
         <ProgressBar Foreground="#5EBEC4" Grid.Row="2" Grid.ColumnSpan="2" Margin="12"
                      Minimum="0" Maximum="{Binding Path=TodoList.Count, Mode=OneWay}"
                      Value="{Binding CountDone,Mode=OneWay}"/>
